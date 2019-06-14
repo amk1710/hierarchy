@@ -1,0 +1,17 @@
+﻿  glad.c
+  main.cpp
+  lodepng.cpp
+  GLWindowManager.cpp
+c:\users\andre\documents\hierarchy\hierarchy\hierarchy\glwindowmanager.cpp(42): warning C4101: 'k': unreferenced local variable
+c:\users\andre\documents\hierarchy\hierarchy\hierarchy\glwindowmanager.cpp(35): warning C4101: 'output_image': unreferenced local variable
+c:\users\andre\documents\hierarchy\hierarchy\hierarchy\glwindowmanager.cpp(42): warning C4101: 'j': unreferenced local variable
+c:\users\andre\documents\hierarchy\hierarchy\hierarchy\glwindowmanager.cpp(42): warning C4101: 'i': unreferenced local variable
+c:\users\andre\documents\hierarchy\hierarchy\hierarchy\glwindowmanager.cpp(118): warning C4305: '-=': truncation from 'double' to 'float'
+c:\users\andre\documents\hierarchy\hierarchy\hierarchy\glwindowmanager.cpp(123): warning C4305: '+=': truncation from 'double' to 'float'
+c:\users\andre\documents\hierarchy\hierarchy\hierarchy\glwindowmanager.cpp(128): warning C4305: '+=': truncation from 'double' to 'float'
+c:\users\andre\documents\hierarchy\hierarchy\hierarchy\glwindowmanager.cpp(388): warning C4018: '<': signed/unsigned mismatch
+c:\users\andre\documents\hierarchy\hierarchy\hierarchy\glwindowmanager.cpp(426): warning C4018: '<': signed/unsigned mismatch
+c:\users\andre\documents\hierarchy\hierarchy\hierarchy\glwindowmanager.cpp(442): warning C4018: '<': signed/unsigned mismatch
+  Generating Code...
+  Hierarchy.vcxproj -> C:\Users\Andre\Documents\hierarchy\Hierarchy\Debug\Hierarchy.exe
+  Hierarchy.vcxproj -> C:\Users\Andre\Documents\hierarchy\Hierarchy\Debug\Hierarchy.pdb (Full PDB)

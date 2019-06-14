@@ -1,0 +1,29 @@
+﻿  glad.c
+  main.cpp
+  lodepng.cpp
+c:\users\andre\documents\hierarchy\hierarchy\hierarchy\lodepng.cpp(3390): warning C4267: 'argument': conversion from 'size_t' to 'unsigned int', possible loss of data
+c:\users\andre\documents\hierarchy\hierarchy\hierarchy\lodepng.cpp(4339): warning C4267: '=': conversion from 'size_t' to 'unsigned int', possible loss of data
+  GLWindowManager.cpp
+c:\users\andre\documents\hierarchy\hierarchy\hierarchy\glwindowmanager.cpp(42): warning C4101: 'k': unreferenced local variable
+c:\users\andre\documents\hierarchy\hierarchy\hierarchy\glwindowmanager.cpp(35): warning C4101: 'output_image': unreferenced local variable
+c:\users\andre\documents\hierarchy\hierarchy\hierarchy\glwindowmanager.cpp(42): warning C4101: 'j': unreferenced local variable
+c:\users\andre\documents\hierarchy\hierarchy\hierarchy\glwindowmanager.cpp(42): warning C4101: 'i': unreferenced local variable
+c:\users\andre\documents\hierarchy\hierarchy\hierarchy\glwindowmanager.cpp(118): warning C4305: '-=': truncation from 'double' to 'float'
+c:\users\andre\documents\hierarchy\hierarchy\hierarchy\glwindowmanager.cpp(123): warning C4305: '+=': truncation from 'double' to 'float'
+c:\users\andre\documents\hierarchy\hierarchy\hierarchy\glwindowmanager.cpp(128): warning C4305: '+=': truncation from 'double' to 'float'
+c:\users\andre\documents\hierarchy\hierarchy\hierarchy\glwindowmanager.cpp(914): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+  Generating Code...
+GLWindowManager.obj : error LNK2019: unresolved external symbol glfwInit referenced in function "public: void __cdecl GLWindowManager::InitializeSceneInfo(void)" (?InitializeSceneInfo@GLWindowManager@@QEAAXXZ)
+GLWindowManager.obj : error LNK2019: unresolved external symbol glfwTerminate referenced in function "public: void __cdecl GLWindowManager::InitializeSceneInfo(void)" (?InitializeSceneInfo@GLWindowManager@@QEAAXXZ)
+GLWindowManager.obj : error LNK2019: unresolved external symbol glfwWindowHint referenced in function "public: void __cdecl GLWindowManager::InitializeSceneInfo(void)" (?InitializeSceneInfo@GLWindowManager@@QEAAXXZ)
+GLWindowManager.obj : error LNK2019: unresolved external symbol glfwCreateWindow referenced in function "public: void __cdecl GLWindowManager::InitializeSceneInfo(void)" (?InitializeSceneInfo@GLWindowManager@@QEAAXXZ)
+GLWindowManager.obj : error LNK2019: unresolved external symbol glfwWindowShouldClose referenced in function "public: void __cdecl GLWindowManager::StartRenderLoop(void)" (?StartRenderLoop@GLWindowManager@@QEAAXXZ)
+GLWindowManager.obj : error LNK2019: unresolved external symbol glfwSetWindowShouldClose referenced in function "public: void __cdecl GLWindowManager::processInput(struct GLFWwindow *)" (?processInput@GLWindowManager@@QEAAXPEAUGLFWwindow@@@Z)
+GLWindowManager.obj : error LNK2019: unresolved external symbol glfwSetFramebufferSizeCallback referenced in function "public: void __cdecl GLWindowManager::InitializeSceneInfo(void)" (?InitializeSceneInfo@GLWindowManager@@QEAAXXZ)
+GLWindowManager.obj : error LNK2019: unresolved external symbol glfwPollEvents referenced in function "public: void __cdecl GLWindowManager::StartRenderLoop(void)" (?StartRenderLoop@GLWindowManager@@QEAAXXZ)
+GLWindowManager.obj : error LNK2019: unresolved external symbol glfwGetKey referenced in function "public: void __cdecl GLWindowManager::processInput(struct GLFWwindow *)" (?processInput@GLWindowManager@@QEAAXPEAUGLFWwindow@@@Z)
+GLWindowManager.obj : error LNK2019: unresolved external symbol glfwMakeContextCurrent referenced in function "public: void __cdecl GLWindowManager::InitializeSceneInfo(void)" (?InitializeSceneInfo@GLWindowManager@@QEAAXXZ)
+GLWindowManager.obj : error LNK2019: unresolved external symbol glfwSwapBuffers referenced in function "public: void __cdecl GLWindowManager::StartRenderLoop(void)" (?StartRenderLoop@GLWindowManager@@QEAAXXZ)
+GLWindowManager.obj : error LNK2019: unresolved external symbol glfwGetProcAddress referenced in function "public: void __cdecl GLWindowManager::InitializeSceneInfo(void)" (?InitializeSceneInfo@GLWindowManager@@QEAAXXZ)
+C:\Users\Andre\Documents\hierarchy\Hierarchy\Libs\glfw3.lib : warning LNK4272: library machine type 'X86' conflicts with target machine type 'x64'
+C:\Users\Andre\Documents\hierarchy\Hierarchy\x64\Debug\Hierarchy.exe : fatal error LNK1120: 12 unresolved externals
