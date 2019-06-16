@@ -162,7 +162,7 @@ void main()
 	//se estou usando textura, a cor final é:
 	pixelColor = vec4(vec3(texture(texture_data, fgTexCoord)) * (ambientColor + diffuseColor) + specularColor, 1);
 
-	debug = 1;
+	debug = 0;
 	if(debug == 1)
 	{
 		pixelColor = vec4(1, 0, 0, 1);

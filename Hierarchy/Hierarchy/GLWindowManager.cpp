@@ -198,8 +198,8 @@ void GLWindowManager::UpdateMVPMatrix()
 {
 	//construct model, view and projection matrices:
 
-	glm::mat4 Projection = glm::perspective(glm::radians(45.0f), 4.0f / 3.0f, 0.1f, 100.0f);
-	glm::mat4 View = glm::lookAt(eye, cameraTarget, up);
+	Projection = glm::perspective(glm::radians(45.0f), 4.0f / 3.0f, 0.1f, 100.0f);
+	View = glm::lookAt(eye, cameraTarget, up);
 
 }
 
