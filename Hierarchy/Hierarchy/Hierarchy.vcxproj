@@ -168,10 +168,12 @@
     <ClCompile Include="GLWindowManager.cpp" />
     <ClCompile Include="lodepng.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="RenderObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GLWindowManager.h" />
     <ClInclude Include="lodepng.h" />
+    <ClInclude Include="RenderObject.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="debugShader.frag" />

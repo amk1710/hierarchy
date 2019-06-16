@@ -9,7 +9,7 @@ layout (location = 3) in vec2 vtTexCoord;
 layout (location = 4) in vec3 vtTangent;
 layout (location = 5) in vec3 vtBitangent;
 
-out vec3 fgPosition;
+out vec4 fgPosition;
 out vec4 fgColor;
 out vec3 fgNormal;
 out vec2 fgTexCoord;
@@ -17,11 +17,10 @@ out vec2 fgTexCoord;
 out vec3 fgTangent;
 out vec3 fgBitangent;
 
-//matriz model-view-projection
-uniform mat4 mvp;
-uniform mat4 mv;
+//matrizes model, view, projection
+uniform mat4 m;
 uniform mat4 v;
-uniform mat4 ITmv; // a inversa transposta da model-view
+uniform mat4 p;
 
 //eye, em coordenadas do mundo
 uniform vec3 eye;
@@ -30,10 +29,10 @@ void main()
 {
 	
 	//multiplicação da posição do vértice pela matriz model-view-projection
-	
-	gl_Position = mvp * vec4(aPos.x, aPos.y, aPos.z, 1.0); //???
-	
-	fgPosition= vec3(aPos.x, aPos.y, aPos.z);
+	mat4 mvp = p * v * m;
+	gl_Position = mvp * vec4(aPos.x, aPos.y, aPos.z, 1.0);
+
+	fgPosition = vec4(aPos.x, aPos.y, aPos.z, 1.0);
 	
 	//passa adiante cor para o fragment shader
 	fgColor = vec4(vtColor, 1.0f);

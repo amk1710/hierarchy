@@ -9,6 +9,7 @@
 #include <vector>
 #include <tiny_obj_loader.h>
 
+#include "RenderObject.h"
 
 using namespace std;
 
@@ -16,37 +17,17 @@ class GLWindowManager
 {
 
 private:
+
+	//temporário, enquanto eu não implemento a árvore
+	std::vector<RenderObject> objects;
+
 	GLFWwindow* window;
-	unsigned int VAO;
-	unsigned int VBO;
-	unsigned int EBO;
+	
 	unsigned int colorBuffer;
 
 	unsigned int screenWidth = 800;
 	unsigned int screenHeight = 600;
 
-
-
-	tinyobj::attrib_t attrib;
-	std::vector<tinyobj::shape_t> shapes;
-	std::vector<tinyobj::material_t> materials;
-
-
-	std::vector<float> vertices;
-	std::vector<float> colors;
-	std::vector<uint32_t> indices;
-
-	bool IsTextureLoaded;
-	bool IsBumpmapLoaded;
-	int width;
-	int height;
-	int nrChannels;
-	unsigned char *data;
-
-	unsigned int tex1;
-	unsigned int tex2;
-	unsigned int tex3;
-	bool tex3active;
 
 	int width_bm;
 	int height_bm;
@@ -56,11 +37,8 @@ private:
 	unsigned int texture;
 	unsigned int bumpmap;
 
-	glm::mat4 model;
-	glm::mat4 view;
-	glm::mat4 modelView;
-	glm::mat4 ITmodelView;
-	glm::mat4 modelViewProjection;
+	glm::mat4 Projection;
+	glm::mat4 View;
 
 	float angle;
 
@@ -72,9 +50,6 @@ private:
 	//aux functions
 	std::string GLWindowManager::readShaderFile(const char* name);
 	void GLWindowManager::UpdateMVPMatrix();
-	unsigned int GLWindowManager::loadTexture(char const * path);
-	void GLWindowManager::FBO_2_file();
-	void GLWindowManager::renderQuad();
 	void GLWindowManager::BuildShader(const char* filepath, unsigned int* shaderID, int shader_enum);
 	void GLWindowManager::randomPointInSphere(float *x, float *y, float *z, float radius);
 
@@ -102,13 +77,8 @@ public:
 	GLWindowManager();
 	~GLWindowManager();
 	void InitializeSceneInfo();
-	void GLWindowManager::LoadModel(const char* objName, bool randomColors);
-	void GLWindowManager::LoadTexture(const char* filepath);
-	void GLWindowManager::LoadBumpmap(const char* filepath);
 	void GLWindowManager::StartRenderLoop();
 
-
-	float scale;
 	glm::vec3 eye;
 	glm::vec3 cameraTarget;
 	glm::vec3 up;
