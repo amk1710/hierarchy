@@ -15,11 +15,6 @@ class RenderObject
 {
 
 private:
-	
-	//posição, escala e rotação do objeto
-	float positionX, positionY, positionZ;
-	float scale;
-	float angle;
 
 	unsigned int VAO;
 	unsigned int VBO;
@@ -50,6 +45,11 @@ public:
 	
 	RenderObject();
 	~RenderObject();
+
+	//posição, escala e rotação do objeto
+	float positionX, positionY, positionZ;
+	float scale;
+	float angle;
 
 	void LoadObjectFromPath(char const * path);
 	void Initialize();

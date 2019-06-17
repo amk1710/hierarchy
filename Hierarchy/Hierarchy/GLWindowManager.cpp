@@ -300,10 +300,38 @@ void GLWindowManager::InitializeSceneInfo()
 
 	//LOAD OBJECTS
 
-	RenderObject obj = RenderObject();
+	//instancia uma "matriz" de tres dimensões de objetos
+	int n_side = 3; // NxNxN
+	float offset = 5.0f; // a distância entre dois objs
+	int startOffset = -offset * (n_side % 2);
+
+	for (int i = 0; i < n_side; i++)
+	{
+		for (int j = 0; j < n_side; j++)
+		{
+			for (int k = 0; k < n_side; k++)
+			{
+				RenderObject obj = RenderObject();
+				obj.LoadObjectFromPath("golfball/golfball.obj");
+				obj.Initialize();
+				obj.positionX = startOffset + i * offset;
+				obj.positionY = startOffset + j * offset;
+				obj.positionZ = startOffset + k * offset;
+				objects.push_back(obj);
+
+			}
+		}
+	}
+
+	/*RenderObject obj = RenderObject();
 	obj.LoadObjectFromPath("golfball/golfball.obj");
 	obj.Initialize();
-	objects.push_back(obj);
+	obj.positionX = 5.0f;
+	obj.positionY = 5.0f;
+	obj.positionZ = 5.0f;*/
+
+	//objects.push_back(obj);
+
 	
 
 	//default values for eye, camera target and up. 
@@ -313,9 +341,9 @@ void GLWindowManager::InitializeSceneInfo()
 
 	//values for up to 4 lights
 	int maxLights = 4;
-	nLights = 4;
+	nLights = 1;
 	
-	lights = { 5,5,5,    0,0,1,   0.5f,0.5f,1.5f };
+	lights = { 0,0,0,    0,0,1,   0.5f,0.5f,1.5f };
 	lightsColors = { 0.5f, 0.5f, 0.5f,	1,1,1,	1,1,1,	1,1,1 };
 
 	//END: LOAD MODELS
@@ -329,9 +357,23 @@ void GLWindowManager::InitializeSceneInfo()
 void GLWindowManager::StartRenderLoop()
 {
 	//the render loop
-	cout << gPass << endl;
+	
+	lastTime = glfwGetTime();
+	int nbFrames = 0;
+
 	while (!glfwWindowShouldClose(window))
 	{
+		//counts seconds per frame
+		double currentTime = glfwGetTime();
+		nbFrames++;
+		if (currentTime - lastTime >= 1.0) //se já passou um segundo,
+		{
+			//printo spf e reseto
+			cout << 1000.0 / double(nbFrames) << "ms/frame" << endl;
+			nbFrames = 0;
+			lastTime += 1.0f;
+		}
+		
 		processInput(window);
 
 		//clear pixels

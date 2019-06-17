@@ -351,7 +351,11 @@ void RenderObject::Render(unsigned int shaderID)
 	glBindTexture(GL_TEXTURE_2D, tex2);
 
 	//passa a model deste objeto pra placa
+	//quero rotacionar/escalar primeiro, depois transladar
 	model = glm::scale(glm::mat4(1.0f), glm::vec3(scale)) * glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::translate(model, glm::vec3(positionX, positionY, positionZ));
+	
+	
 	int mParam = glGetUniformLocation(shaderID, "m");
 	glUniformMatrix4fv(mParam, 1, GL_FALSE, glm::value_ptr(model));
 

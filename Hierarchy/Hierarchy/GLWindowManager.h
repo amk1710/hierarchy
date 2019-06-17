@@ -68,9 +68,10 @@ private:
 	bool usingDebug;
 	unsigned int selectTexture;
 
-	unsigned int quadVAO = 0;
-	unsigned int quadVBO;
-	
+	//seconds per frame counter
+	double lastTime;
+	int nbFrames;
+
 	
 
 public:
