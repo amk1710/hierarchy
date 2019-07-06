@@ -42,6 +42,7 @@ void GLWindowManager::processInput(GLFWwindow *window)
 		glfwSetWindowShouldClose(window, true);
 	}
 
+	//move olho
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 	{
 		eye.x -= 0.01;
@@ -72,12 +73,40 @@ void GLWindowManager::processInput(GLFWwindow *window)
 		eye.y -= 0.01f;
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
+	//move camera target
+	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
 	{
-		//tex3active = !tex3active;
+		cameraTarget.x -= 0.01;
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
+	{
+		cameraTarget.x += 0.01;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
+	{
+		cameraTarget.z += 0.01;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
+	{
+		cameraTarget.z -= 0.01f;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+	{
+		cameraTarget.y += 0.01f;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS)
+	{
+		cameraTarget.y -= 0.01f;
+	}
+
+
+	//rotaciona objeto?
+	/*if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
 	{
 		angle += 0.001f;
 	}
@@ -85,66 +114,7 @@ void GLWindowManager::processInput(GLFWwindow *window)
 	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
 	{
 		angle -= 0.001f;
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
-	{
-		incNLights = min(incNLights + 0.1f, 32.0f);
-		nLights = int(incNLights);
-		cout << "nLights: " << nLights << endl;
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
-	{
-		incNLights = max(incNLights - 0.1f, 0.0f);
-		nLights = int(incNLights);
-		cout << "nLights: " << nLights << endl;
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS)
-	{
-		usingDebug = true;
-		cout << "Using Debug: true" << endl;
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS)
-	{
-		usingDebug = false;
-		cout << "Using Debug: false" << endl;
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-	{
-		selectTexture = 1;
-		cout << "selectTexture: Position" << endl;
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
-	{
-		selectTexture = 2;
-		cout << "selectTexture: Bump normal" << endl;
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
-	{
-		selectTexture = 3;
-		cout << "selectTexture: color" << endl;
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
-	{
-		selectTexture = 4;
-		cout << "selectTexture: tangent" << endl;
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
-	{
-		selectTexture = 5;
-		cout << "selectTexture: bitangent" << endl;
-	}
-
-
-
+	}*/
 
 }
 
@@ -200,6 +170,31 @@ void GLWindowManager::UpdateMVPMatrix()
 
 	Projection = glm::perspective(glm::radians(45.0f), 4.0f / 3.0f, 0.1f, 100.0f);
 	View = glm::lookAt(eye, cameraTarget, up);
+
+	//adicionei aqui este cálculo dos planos, que ajuda no cálculo do frustum culling. Posso depois deslocar isso para a classe da árvore
+
+	//planes_normals[i] -> a normal, no espaço do mundo, do i-ésimo plano
+	//planes_points[i] -> um ponto no i-ésimo plano que define sua distância até a origem
+
+	//glm::mat4 vp_inv = glm::inverse(Projection * View);
+
+	//glm::vec3 def_planes[6] { glm::vec3(1, 0, 0), glm::vec3(-1, 0, 0), glm::vec3(0, 1, 0), glm::vec3(0, -1, 0), glm::vec3(0, 0, 1), glm::vec3(0, 0, -1) }; //em ordem: right, left, front, back, top, bottom
+	////curiosamente, não preciso de def_points pq eles são iguais em valor ao def_planes
+	//for (int i = 0; i < 6; i++)
+	//{
+	//	glm::vec4 temp_normal = vp_inv * glm::vec4(def_planes[i], 1.0f); //transformo, 
+	//	temp_normal = temp_normal / temp_normal.w; //e divido para voltar pro espaço euclidiano
+
+	//	planes_normals[i] = glm::vec3(temp_normal);
+
+	//	//transformo o ponto( o cálculo é o mesmo!)
+	//	planes_points[i] = planes_normals[i];
+
+	//	//normalizo normal?
+	//	planes_normals[i] = glm::normalize(planes_normals[i]);
+
+	//	
+	//}
 
 }
 
@@ -301,9 +296,9 @@ void GLWindowManager::InitializeSceneInfo()
 	//LOAD OBJECTS
 
 	//instancia uma "matriz" de tres dimensões de objetos
-	int n_side = 3; // NxNxN
+	int n_side = 1; // NxNxN
 	float offset = 5.0f; // a distância entre dois objs
-	int startOffset = -offset * (n_side % 2);
+	int startOffset = -offset * ((n_side - 1) / 2);
 
 	for (int i = 0; i < n_side; i++)
 	{
@@ -343,7 +338,7 @@ void GLWindowManager::InitializeSceneInfo()
 	int maxLights = 4;
 	nLights = 1;
 	
-	lights = { 0,0,0,    0,0,1,   0.5f,0.5f,1.5f };
+	lights = { 10,10,10,    0,0,1,   0.5f,0.5f,1.5f };
 	lightsColors = { 0.5f, 0.5f, 0.5f,	1,1,1,	1,1,1,	1,1,1 };
 
 	//END: LOAD MODELS
@@ -407,7 +402,9 @@ void GLWindowManager::StartRenderLoop()
 
 		for (int i = 0; i < objects.size(); i++)
 		{
+			FrustumCheck r = objects[i].IsInsideFrustum(Projection * View);
 			objects[i].Render(gPass);
+			//cout << "Object " << i << ": " << r << endl;
 		}
 
 		glfwSwapBuffers(window);

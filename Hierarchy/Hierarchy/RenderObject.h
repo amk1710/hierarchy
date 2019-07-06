@@ -11,6 +11,23 @@
 
 using namespace std;
 
+//enumeração retornada pela função IsInsideFrustum
+enum FrustumCheck {INSIDE, OUTSIDE, INTERSECT};
+
+struct Vertex {
+	glm::vec3 position;
+	glm::vec3 color;
+	glm::vec3 normal;
+	glm::vec2 texcoord;
+	glm::vec3 tangent;
+	glm::vec3 bitangent;
+
+	bool operator==(const Vertex& other) const {
+		return position == other.position && color == other.color && texcoord == other.texcoord; //não exigimos que as normais, tangentes e bitangentes sejam iguais
+	}
+
+};
+
 class RenderObject
 {
 
@@ -38,10 +55,25 @@ private:
 	unsigned int tex1;
 	unsigned int tex2;
 
+	//coisas para a bounding box
+	glm::vec3 Bmin;
+	glm::vec3 Bmax;
+	glm::vec3 LUT[8];
+	std::vector<Vertex> aux_vertices; //inicializado quando loada o modelo, útil para construir a caixa
+	void ConstructBoundingBox();
+	
+
 	void LoadModel(const char* objName, bool randomColors);
 	unsigned int LoadTexture(char const * path);
 
-public: 
+public:
+
+	//recebe como argumento as seis normais que definem os planos do frustum, no espaço do mundo,
+	//e os seis pontos que definem o deslocamento do plano em relação à origem
+	FrustumCheck IsInsideFrustum(glm::mat4 ViewProjection);
+
+
+//public:
 	
 	RenderObject();
 	~RenderObject();
@@ -51,6 +83,8 @@ public:
 	float scale;
 	float angle;
 
+
+	void CheckFrustumAndRender(unsigned int shaderID, glm::mat4 ViewProjection);
 	void LoadObjectFromPath(char const * path);
 	void Initialize();
 	void Render(unsigned int shaderID);

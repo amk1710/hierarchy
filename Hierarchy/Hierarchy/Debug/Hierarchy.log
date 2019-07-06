@@ -1,8 +1,11 @@
 ﻿  GLWindowManager.cpp
-c:\users\andre\documents\hierarchy\hierarchy\hierarchy\glwindowmanager.cpp(47): warning C4305: '-=': truncation from 'double' to 'float'
-c:\users\andre\documents\hierarchy\hierarchy\hierarchy\glwindowmanager.cpp(52): warning C4305: '+=': truncation from 'double' to 'float'
-c:\users\andre\documents\hierarchy\hierarchy\hierarchy\glwindowmanager.cpp(57): warning C4305: '+=': truncation from 'double' to 'float'
-c:\users\andre\documents\hierarchy\hierarchy\hierarchy\glwindowmanager.cpp(306): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-c:\users\andre\documents\hierarchy\hierarchy\hierarchy\glwindowmanager.cpp(408): warning C4018: '<': signed/unsigned mismatch
+c:\users\andre\documents\hierarchy\hierarchy\hierarchy\glwindowmanager.cpp(48): warning C4305: '-=': truncation from 'double' to 'float'
+c:\users\andre\documents\hierarchy\hierarchy\hierarchy\glwindowmanager.cpp(53): warning C4305: '+=': truncation from 'double' to 'float'
+c:\users\andre\documents\hierarchy\hierarchy\hierarchy\glwindowmanager.cpp(58): warning C4305: '+=': truncation from 'double' to 'float'
+c:\users\andre\documents\hierarchy\hierarchy\hierarchy\glwindowmanager.cpp(79): warning C4305: '-=': truncation from 'double' to 'float'
+c:\users\andre\documents\hierarchy\hierarchy\hierarchy\glwindowmanager.cpp(84): warning C4305: '+=': truncation from 'double' to 'float'
+c:\users\andre\documents\hierarchy\hierarchy\hierarchy\glwindowmanager.cpp(89): warning C4305: '+=': truncation from 'double' to 'float'
+c:\users\andre\documents\hierarchy\hierarchy\hierarchy\glwindowmanager.cpp(301): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+c:\users\andre\documents\hierarchy\hierarchy\hierarchy\glwindowmanager.cpp(403): warning C4018: '<': signed/unsigned mismatch
   Hierarchy.vcxproj -> C:\Users\Andre\Documents\hierarchy\Hierarchy\Debug\Hierarchy.exe
   Hierarchy.vcxproj -> C:\Users\Andre\Documents\hierarchy\Hierarchy\Debug\Hierarchy.pdb (Full PDB)

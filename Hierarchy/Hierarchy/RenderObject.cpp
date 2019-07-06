@@ -15,6 +15,7 @@ using namespace std;
 #include <glm/gtx/hash.hpp>
 #include <time.h>
 #include <unordered_map>
+#include <limits>
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader.h>
@@ -40,22 +41,177 @@ RenderObject::~RenderObject()
 
 //auxilary functions and structs
 
+//plane frustum funcionality
+
+//normaliza um plano
+void NormalizePlane(glm::vec4 &plane)
+{
+	float mag = sqrt(plane.x * plane.x + plane.y * plane.y + plane.z * plane.z);
+
+	plane.x = plane.x / mag;
+	plane.y = plane.y / mag;
+	plane.z = plane.z / mag;
+	plane.w = plane.w / mag;
+}
+
+// extrai os frustums planes da matrix mvp
+// https://www.gamedevs.org/uploads/fast-extraction-viewing-frustum-planes-from-world-view-projection-matrix.pdf
+void ExtractFrustumPlanes(glm::mat4 mvp, std::array<glm::vec4, 6> &planes)
+{
+	//// left
+	//planes[0] = glm::vec4(
+	//	mvp[3][0] + mvp[0][0],
+	//	mvp[3][1] + mvp[0][1],
+	//	mvp[3][2] + mvp[0][2],
+	//	mvp[3][3] + mvp[0][3]
+	//);
+
+	////right
+	//planes[1] = glm::vec4(
+	//	mvp[3][0] - mvp[0][0],
+	//	mvp[3][1] - mvp[0][1],
+	//	mvp[3][2] - mvp[0][2],
+	//	mvp[3][3] - mvp[0][3]
+	//);
+
+	////bottom
+	//planes[2] = glm::vec4(
+	//	mvp[3][0] + mvp[1][0],
+	//	mvp[3][1] + mvp[1][1],
+	//	mvp[3][2] + mvp[1][2],
+	//	mvp[3][3] + mvp[1][3]
+	//);
+
+
+	////top
+	//planes[3] = glm::vec4(
+	//	mvp[3][0] - mvp[1][0],
+	//	mvp[3][1] - mvp[1][1],
+	//	mvp[3][2] - mvp[1][2],
+	//	mvp[3][3] - mvp[1][3]
+	//);
+
+	////near
+	//planes[4] = glm::vec4(
+	//	mvp[3][0] + mvp[2][0],
+	//	mvp[3][1] + mvp[2][1],
+	//	mvp[3][2] + mvp[2][2],
+	//	mvp[3][3] + mvp[2][3]
+	//);
+
+	////cout << "mvp mat" << endl;
+	////cout << mvp[2][0] <<", " << mvp[2][1] << ", " << mvp[2][2] << ", " << mvp[2][3] << endl;
+
+	////far
+	//planes[5] = glm::vec4(
+	//	mvp[3][0] - mvp[2][0],
+	//	mvp[3][1] - mvp[2][1],
+	//	mvp[3][2] - mvp[2][2],
+	//	mvp[3][3] - mvp[2][3]
+	//);
+
+	////normaliza os planos, o os orienta "para fora"
+	//for (int i = 0; i < 6; i++)
+	//{
+	//	//NormalizePlane(planes[i]);
+	//}
+	//return;
+
+	//a transposta da mvp, pra destransformar os planos em espaço pós-projeção
+	glm::mat4 mvpT = glm::transpose(mvp);
+
+	//todos os planos estão a 1.0 de distância da origem, mas orientados diferentemente, com normais diferentes
+	planes[0] = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f); //right
+	planes[1] = glm::vec4(-1.0f, 0.0f, 0.0f, 1.0f); //left
+	planes[2] = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f); //up
+	planes[3] = glm::vec4(0.0f, -1.0f, 0.0f, 1.0f); //down
+	planes[4] = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f); //far
+	planes[5] = glm::vec4(0.0f, 0.0f, -1.0f, 1.0f); //near
+
+	for (int i = 0; i < 6; i++)
+	{
+		planes[i] = mvpT * planes[i];
+		//planes[i] = planes[i] / planes[i].w;
+	}
+
+	return;
+
+}
+
+//os planos que definem, no opengl, o cubo para renderização, obtido após a multiplicação pela matriz de projeção
+//a ideia é, depois, na verificação de se este objeto está no frustum, multiplicar estes planos pela inversa da mvp,
+// de modo a obter o frustum no espaço do objeto e poder verificar
+//checks if the computed bounding box for this object is inside the view frustum
+
+
+//recebe como parametro as normais que definem cada plano, no espaço do mundo, e o ponto que marca o deslocamento deste plano a partir da origem
+//ou não né, vamos ver
+
+FrustumCheck RenderObject::IsInsideFrustum(glm::mat4 ViewProjection)
+{
+	std::array<glm::vec4, 6> planes;
+	
+	ExtractFrustumPlanes(ViewProjection * model, planes);
+	
+	//planos estão no espaço do modelo, direcionados para fora (?)
+	//ax + by + cz + d = 0, em um glm::vec4?
+
+	bool intersects = false;
+
+	for (int i = 0; i < 6; i++)
+	{
+		glm::vec3 normal = glm::vec3(planes[i]);
+		normal = glm::normalize(normal);
+
+		float d = planes[i].w;
+		//acessa LUT baseado na normal do plano
+		int s1 = normal.x > 0 ? 1 : 0; //e se for == 0? Não importa?
+		int s2 = normal.y > 0 ? 1 : 0;
+		int s3 = normal.z > 0 ? 1 : 0;
+		
+		glm::vec3 Pmax = LUT[4 * s1 + 2 * s2 + s3]; //max ou min?
+		//inverte LUTs (eu acho que pode ser feito de outro jeito, com 8 - x = y?)
+		s1 = s1 == 1 ? 0 : 1;
+		s2 = s2 == 1 ? 0 : 1;
+		s3 = s3 == 1 ? 0 : 1;
+		glm::vec3 Pmin = LUT[4 * s1 + 2 * s2 + s3]; //max ou min
+
+		//calcula para o ponto Pmin e Pmax a distância até o plano
+		//normais apontam para fora (?)
+		//http://mathworld.wolfram.com/Point-PlaneDistance.html
+		float distMin = glm::dot(normal, Pmin) + d; // >0 mesmo lado, <0 outro lado, ==0 no plano;
+		float distMax = glm::dot(normal, Pmax) + d;
+		
+		//>0 tá dentro, < 0 tá fora
+		if(distMin < 0.0f && distMax < 0.0f) //Pmin e Pmax estão fora
+		{
+			return OUTSIDE;
+		}
+		else if(distMin < 0.0f && distMax > 0.0f) //Pmin está dentro e Pmax está fora
+		{
+			intersects = true;
+		}
+		else
+		{
+			//está dentro para este plano, continuo checando
+		}
+
+	}
+
+	if(intersects)
+	{
+		return INTERSECT;
+	}
+	else
+	{
+		return INSIDE;
+	}
+
+}
+
 // MODEL LOADING FUNCTIONALITY
 
 //pra usar a unordered map abaixo, precisamos implementar o == e uma função hash:
-struct Vertex {
-	glm::vec3 position;
-	glm::vec3 color;
-	glm::vec3 normal;
-	glm::vec2 texcoord;
-	glm::vec3 tangent;
-	glm::vec3 bitangent;
-
-	bool operator==(const Vertex& other) const {
-		return position == other.position && color == other.color && texcoord == other.texcoord; //não exigimos que as normais, tangentes e bitangentes sejam iguais
-	}
-
-};
 
 namespace std {
 	template<> struct hash<Vertex> {
@@ -84,7 +240,7 @@ void RenderObject::LoadModel(const char* objName, bool randomColors = false)
 	std::vector<int> number_of_faces;
 
 	std::unordered_map<Vertex, uint32_t> unique_vertices = {};
-	std::vector<Vertex> aux_vertices = {};
+	aux_vertices = {};
 	indices.clear();
 	for (const auto& shape : shapes)
 	{
@@ -278,6 +434,56 @@ void RenderObject::LoadObjectFromPath(char const * path)
 	//tex2 = loadTexture("stones/stones_norm.jpg");
 	tex2 = LoadTexture("golfball/golfball.png");
 
+	ConstructBoundingBox();
+
+}
+
+//auxiliar para construir uma bounding box
+void RenderObject::ConstructBoundingBox()
+{
+	float min = std::numeric_limits<float>::min();
+	float max = std::numeric_limits<float>::max();
+	Bmin = glm::vec3(max, max, max);
+	Bmax = glm::vec3(min, min, min);
+	for (Vertex vertex : aux_vertices)
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			if (vertex.position[i] < Bmin[i])
+			{
+				Bmin[i] = vertex.position[i];
+			}
+			if (vertex.position[i] > Bmax[i])
+			{
+				Bmax[i] = vertex.position[i];
+			}
+		}
+	}
+
+	//na prática, 3,3,3 acabou funcionando melhor por causa de erro numérico, creio eu
+	Bmin = glm::vec3(-3.0f, -3.0f, -3.0f);
+	Bmax = glm::vec3(3.0f, 3.0f, 3.0f);
+
+
+	//com Bmin e Bmax, constrói LUT para acesso rápido de Vmin, Vmax
+	LUT[0] = glm::vec3(Bmin.x, Bmin.y, Bmin.z); // 0,0,0 -> min, min min
+	LUT[1] = glm::vec3(Bmin.x, Bmin.y, Bmax.z); // 0,0,1 -> min, min, max
+	LUT[2] = glm::vec3(Bmin.x, Bmax.y, Bmin.z); // 0,1,0 -> min,max,min
+	LUT[3] = glm::vec3(Bmin.x, Bmax.y, Bmax.z); // 0,1,1 -> min,max,max
+	LUT[4] = glm::vec3(Bmax.x, Bmin.y, Bmin.z); // 1,0,0 -> max,min,min
+	LUT[5] = glm::vec3(Bmax.x, Bmin.y, Bmax.z); // 1,0,1 -> max,min,max
+	LUT[6] = glm::vec3(Bmax.x, Bmax.y, Bmin.z); // 1,1,0 -> max,max,min
+	LUT[7] = glm::vec3(Bmax.x, Bmax.y, Bmax.z); // 1,1,1 -> max,max,max
+
+
+
+
+	return;
+}
+
+void ConstructBoundingCircle()
+{
+
 }
 
 void RenderObject::Initialize()
@@ -379,3 +585,58 @@ void RenderObject::Render(unsigned int shaderID)
 	glBindVertexArray(0); //unbind
 
 }
+
+
+
+////(x,y,z) é um ponto, então (x,y,z) está na região "dentro" do plano <----> x*planes.x + y*planes.y + z*planes.z + planes.w > 0
+//
+////transforma os pontos Bmin e Bmax para o espaço NPC
+//
+//glm::mat4 mvp = ViewProjection * model;
+//glm::vec4 ObjMinimum = mvp * glm::vec4(Bmin, 1.0f);
+//ObjMinimum = ObjMinimum / ObjMinimum.w;
+//glm::vec4 ObjMaximum = mvp * glm::vec4(Bmax, 1.0f);
+//ObjMaximum = ObjMaximum / ObjMaximum.w;
+//
+////
+//
+////verifica, para cada plano, se está do lado de dentro, fora ou interseccionando:
+//bool intersects = false;
+//
+//
+//for (int i = 0; i < 3; i++)
+//{
+//	if (ObjMaximum[i] < -1.0f || ObjMinimum[i] > 1.0f)
+//	{
+//		//corta pq está fora de um plano LEFT/BOTTOM/FAR ou RIGHT/TOP/NEAR
+//		return OUTSIDE;
+//	}
+//	else if (ObjMaximum[i] > 1.0f || ObjMinimum[i] < -1.0f) //aqui temos ObjMinimum[i] <= 1.0f && ObjMaximum[i] >= -1.0f implicitos do if acima
+//	{
+//		//este plano intersecciona com o obj, mas devo ainda sim checar os outros
+//		intersects = true;
+//	}
+//	//senão, tudo aqui está dentro, e tenho que checar os proximos planos
+//}
+//
+////se pelo menos um plano intersecciona o obj e nenhum outro apontou que ele está fora:
+//if (intersects)
+//{
+//	return INTERSECT;
+//}
+//
+////se não está fora de nenhum plano nem intersecta nenhum, está total dentro
+////chequei todos os planos, nenhum apontou que o objeto está 
+//
+//if (ObjMaximum.x < -1.0f)
+//{
+//	//corta pq está fora de um plano LEFT
+//	return OUTSIDE;
+//}
+//else if (ObjMinimum.x > 1.0f)
+//{
+//	//corta pq está fora do RIGHT
+//	return OUTSIDE;
+//}
+//
+//return INSIDE;

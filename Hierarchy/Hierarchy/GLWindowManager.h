@@ -72,6 +72,11 @@ private:
 	double lastTime;
 	int nbFrames;
 
+	//stuff for helping with view frustum calculation
+	glm::vec3 planes_normals[6];
+	glm::vec3 planes_points[6];
+
+
 	
 
 public:
