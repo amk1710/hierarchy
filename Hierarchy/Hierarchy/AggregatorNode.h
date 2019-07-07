@@ -12,9 +12,17 @@ using namespace std;
 class AggregatorNode : public BVHNode
 {
 private:
-	std::vector<BVHNode> children;
+	std::vector<BVHNode*> children;
 public:
 
-	void CheckFrustumAndRender(unsigned int shaderID, glm::mat4 ViewProjection);
-	void Render(unsigned int shaderID);
+	FrustumCheck IsInsideFrustum(glm::mat4 ModelViewProjection);
+	int CheckFrustumAndRender(unsigned int shaderID, glm::mat4 ViewProjection);
+	int Render(unsigned int shaderID);
+
+	void PushBVHNode(BVHNode* node);
+
+	void FreeNode();
+
+	glm::vec3 GetBmin();
+	glm::vec3 GetBmax();
 };

@@ -17,14 +17,14 @@ using namespace std;
 #include <unordered_map>
 #include <limits>
 
-#define TINYOBJLOADER_IMPLEMENTATION
-#include <tiny_obj_loader.h>
-
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+#define TINYOBJLOADER_IMPLEMENTATION
+
 #include "BVHNode.h"
 #include "RenderObject.h"
+#include "AggregatorNode.h"
 
 //constructor and destructor
 //pretty useless right now
@@ -40,12 +40,32 @@ RenderObject::~RenderObject()
 
 }
 
+void RenderObject::FreeNode()
+{
+	return;
+}
+
+////copy constructor
+//RenderObject::RenderObject(const RenderObject &rhs)
+//{
+//
+//}
+
 //auxilary functions and structs
 
 
-void RenderObject::CheckFrustumAndRender(unsigned int shaderID, glm::mat4 ViewProjection)
+int RenderObject::CheckFrustumAndRender(unsigned int shaderID, glm::mat4 ViewProjection)
 {
-	return;
+	FrustumCheck check = IsInsideFrustum(ViewProjection);
+	switch (check)
+	{
+	case INSIDE:
+	case INTERSECT:
+		Render(shaderID);
+		return 1;
+	case OUTSIDE:
+		return 0;
+	}
 }
 
 // MODEL LOADING FUNCTIONALITY
@@ -309,29 +329,17 @@ void RenderObject::ConstructBoundingBox()
 	//Bmax = glm::vec3(3.0f, 3.0f, 3.0f);
 
 
-	//com Bmin e Bmax, constrói LUT para acesso rápido de Vmin, Vmax
-	LUT[0] = glm::vec3(Bmin.x, Bmin.y, Bmin.z); // 0,0,0 -> min, min min
-	LUT[1] = glm::vec3(Bmin.x, Bmin.y, Bmax.z); // 0,0,1 -> min, min, max
-	LUT[2] = glm::vec3(Bmin.x, Bmax.y, Bmin.z); // 0,1,0 -> min,max,min
-	LUT[3] = glm::vec3(Bmin.x, Bmax.y, Bmax.z); // 0,1,1 -> min,max,max
-	LUT[4] = glm::vec3(Bmax.x, Bmin.y, Bmin.z); // 1,0,0 -> max,min,min
-	LUT[5] = glm::vec3(Bmax.x, Bmin.y, Bmax.z); // 1,0,1 -> max,min,max
-	LUT[6] = glm::vec3(Bmax.x, Bmax.y, Bmin.z); // 1,1,0 -> max,max,min
-	LUT[7] = glm::vec3(Bmax.x, Bmax.y, Bmax.z); // 1,1,1 -> max,max,max
-
-
-
+	UpdateLUT();
 
 	return;
 }
 
-void ConstructBoundingCircle()
-{
-
-}
-
 void RenderObject::Initialize()
 {
+	//atualiza matriz de model para pre-renderização correta
+	model = glm::scale(glm::mat4(1.0f), glm::vec3(scale)) * glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::translate(model, glm::vec3(positionX, positionY, positionZ));
+	
 	////cria objeto VAO para guardar o que vai ser configurado abaixo:
 	glGenVertexArrays(1, &VAO);
 	//bind VAO
@@ -390,7 +398,7 @@ void RenderObject::Initialize()
 //matrizes v e p
 //shader a ser usado (já está binded)
 //clears
-void RenderObject::Render(unsigned int shaderID)
+int RenderObject::Render(unsigned int shaderID)
 {
 
 	glBindVertexArray(VAO); //bind
@@ -428,6 +436,79 @@ void RenderObject::Render(unsigned int shaderID)
 	
 	glBindVertexArray(0); //unbind
 
+	return 1;
+
+}
+
+//constrói hierarquia de objetos, a partir de uma lista de objs concretos renderizáveis
+//se baseia nas subclasses aggregator node e renderobject
+
+//aux: funcção recursiva
+BVHNode* RenderObject::ConstructHierarchy_aux(std::vector<BVHNode*> objects, int s, int e) //as posições de começo e fim da lista, para fazer a recursão
+{
+	//fazemos um algoritmo bem simplista: o median-cut, como descrito brevemente em
+	//https://cumincad.architexturez.net/system/files/pdf/67d2.content.pdf
+
+	assert(s <= e); // se s < e, alguma coisa deu errado na construção da árvore. Ela termina com nós renderobject, não com nulls
+
+	if (s == e)
+	{
+		//retorno o nó que já está na lista, que deve ser um render object
+		return objects[s];
+	}
+	else
+	{
+		//construo um aggregator e recurso 2x
+		AggregatorNode* agg = new AggregatorNode();
+
+		BVHNode* left = ConstructHierarchy_aux(objects, s, (s + e) / 2);
+		BVHNode* right = ConstructHierarchy_aux(objects, ((s + e) / 2) + 1, e);
+
+		//adjust bounds: a nova caixa pega os mins e maxs das dimensões das duas subcaixas
+		glm::vec3 LBmin = left->GetBmin();
+		glm::vec3 RBmin = right->GetBmin();
+
+		glm::vec3 LBmax = left->GetBmax();
+		glm::vec3 RBmax = right->GetBmax();
+
+		agg->Bmin = glm::vec3(glm::min(LBmin.x, RBmin.x), glm::min(LBmin.y, RBmin.y), glm::min(LBmin.z, RBmin.z));
+		agg->Bmax = glm::vec3(glm::max(LBmax.x, RBmax.x), glm::max(LBmax.y, RBmax.y), glm::max(LBmax.z, RBmax.z));
+		agg->UpdateLUT();
+
+		agg->PushBVHNode(left);
+		agg->PushBVHNode(right);
+
+
+		return agg;
+
+	}
+}
+
+BVHNode* RenderObject::ConstructHierarchy(std::vector<BVHNode*> objects)
+{
+	////por ora, não faz nada senão agregar os objs num aggregator node
+	//AggregatorNode* agg = new AggregatorNode();
+
+	//for (BVHNode* obj : objects)
+	//{
+	//	agg->PushBVHNode(obj);
+	//}
+
+	//return agg;
+
+	return RenderObject::ConstructHierarchy_aux(objects, 0, objects.size() - 1);
+
+
+}
+
+//no caso desta subclasse, estou salvando no espaço do modelo e devo converter pra mundo antes de retornar
+glm::vec3 RenderObject::GetBmin()
+{
+	return glm::vec3(model * glm::vec4(Bmin, 1));
+}
+glm::vec3 RenderObject::GetBmax()
+{
+	return glm::vec3(model * glm::vec4(Bmax, 1));
 }
 
 

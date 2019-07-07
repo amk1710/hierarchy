@@ -10,6 +10,7 @@
 #include <tiny_obj_loader.h>
 
 #include "RenderObject.h"
+#include "BVHNode.h"
 
 using namespace std;
 
@@ -19,7 +20,9 @@ class GLWindowManager
 private:
 
 	//temporário, enquanto eu não implemento a árvore
-	std::vector<RenderObject> objects;
+
+	std::vector<BVHNode*> objects;
+	BVHNode* HierarchyRoot; // o root da árvore hierárquica
 
 	GLFWwindow* window;
 	

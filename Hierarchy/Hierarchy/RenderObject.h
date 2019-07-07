@@ -9,6 +9,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <vector>
 
+#include <tiny_obj_loader.h>
 
 #include "BVHNode.h"
 
@@ -62,6 +63,8 @@ private:
 	std::vector<Vertex> aux_vertices; //inicializado quando loada o modelo, útil para construir a caixa
 	void ConstructBoundingBox();
 	
+	//aux: funcção recursiva
+	static BVHNode* RenderObject::ConstructHierarchy_aux(std::vector<BVHNode*> objects, int s, int e); //as posições de começo e fim da lista, para fazer a recursão
 
 	void LoadModel(const char* objName, bool randomColors);
 	unsigned int LoadTexture(char const * path);
@@ -77,6 +80,7 @@ public:
 	
 	RenderObject();
 	~RenderObject();
+	//RenderObject(const RenderObject& rhs);
 
 	//posição, escala e rotação do objeto
 	float positionX, positionY, positionZ;
@@ -87,7 +91,18 @@ public:
 	//void CheckFrustumAndRender(unsigned int shaderID, glm::mat4 ViewProjection);
 	void LoadObjectFromPath(char const * path);
 	void Initialize();
-	void Render(unsigned int shaderID);
-	void CheckFrustumAndRender(unsigned int shaderID, glm::mat4 ViewProjection);
+	int Render(unsigned int shaderID);
+	int CheckFrustumAndRender(unsigned int shaderID, glm::mat4 ViewProjection);
+
+	void FreeNode();
+
+	//constrói hierarquia de objetos, a partir de uma lista de objs concretos renderizáveis
+	//se baseia nas subclasses aggregator node e renderobject
+	//ps: talvez o mais correto fosse não deixar essas funções aqui, mas tá ok por agora
+	static BVHNode* ConstructHierarchy(std::vector<BVHNode*> objects);
+
+	glm::vec3 GetBmin();
+	glm::vec3 GetBmax();
+
 
 };

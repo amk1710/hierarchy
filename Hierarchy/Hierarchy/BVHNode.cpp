@@ -13,6 +13,7 @@ using namespace std;
 #include <glm/gtc/type_ptr.hpp>
 #include <time.h>
 #include <limits>
+#include <assert.h>
 
 #include <array>
 #include <vector>
@@ -21,71 +22,14 @@ using namespace std;
 #include "stb_image.h"
 
 #include "BVHNode.h"
+#include "AggregatorNode.h"
+#include "RenderObject.h"
 
 //plane frustum funcionality
 // extrai os frustums planes da matrix mvp
 // https://www.gamedevs.org/uploads/fast-extraction-viewing-frustum-planes-from-world-view-projection-matrix.pdf
 void ExtractFrustumPlanes(glm::mat4 mvp, std::array<glm::vec4, 6> &planes)
 {
-	//// left
-	//planes[0] = glm::vec4(
-	//	mvp[3][0] + mvp[0][0],
-	//	mvp[3][1] + mvp[0][1],
-	//	mvp[3][2] + mvp[0][2],
-	//	mvp[3][3] + mvp[0][3]
-	//);
-
-	////right
-	//planes[1] = glm::vec4(
-	//	mvp[3][0] - mvp[0][0],
-	//	mvp[3][1] - mvp[0][1],
-	//	mvp[3][2] - mvp[0][2],
-	//	mvp[3][3] - mvp[0][3]
-	//);
-
-	////bottom
-	//planes[2] = glm::vec4(
-	//	mvp[3][0] + mvp[1][0],
-	//	mvp[3][1] + mvp[1][1],
-	//	mvp[3][2] + mvp[1][2],
-	//	mvp[3][3] + mvp[1][3]
-	//);
-
-
-	////top
-	//planes[3] = glm::vec4(
-	//	mvp[3][0] - mvp[1][0],
-	//	mvp[3][1] - mvp[1][1],
-	//	mvp[3][2] - mvp[1][2],
-	//	mvp[3][3] - mvp[1][3]
-	//);
-
-	////near
-	//planes[4] = glm::vec4(
-	//	mvp[3][0] + mvp[2][0],
-	//	mvp[3][1] + mvp[2][1],
-	//	mvp[3][2] + mvp[2][2],
-	//	mvp[3][3] + mvp[2][3]
-	//);
-
-	////cout << "mvp mat" << endl;
-	////cout << mvp[2][0] <<", " << mvp[2][1] << ", " << mvp[2][2] << ", " << mvp[2][3] << endl;
-
-	////far
-	//planes[5] = glm::vec4(
-	//	mvp[3][0] - mvp[2][0],
-	//	mvp[3][1] - mvp[2][1],
-	//	mvp[3][2] - mvp[2][2],
-	//	mvp[3][3] - mvp[2][3]
-	//);
-
-	////normaliza os planos, o os orienta "para fora"
-	//for (int i = 0; i < 6; i++)
-	//{
-	//	//NormalizePlane(planes[i]);
-	//}
-	//return;
-
 	//a transposta da mvp, pra destransformar os planos em espaço pós-projeção
 	glm::mat4 mvpT = glm::transpose(mvp);
 
@@ -179,4 +123,17 @@ FrustumCheck BVHNode::IsInsideFrustum(glm::mat4 ModelViewProjection)
 		return INSIDE;
 	}
 
+}
+
+void BVHNode::UpdateLUT()
+{
+	//com Bmin e Bmax, constrói LUT para acesso rápido de Vmin, Vmax
+	LUT[0] = glm::vec3(Bmin.x, Bmin.y, Bmin.z); // 0,0,0 -> min, min min
+	LUT[1] = glm::vec3(Bmin.x, Bmin.y, Bmax.z); // 0,0,1 -> min, min, max
+	LUT[2] = glm::vec3(Bmin.x, Bmax.y, Bmin.z); // 0,1,0 -> min,max,min
+	LUT[3] = glm::vec3(Bmin.x, Bmax.y, Bmax.z); // 0,1,1 -> min,max,max
+	LUT[4] = glm::vec3(Bmax.x, Bmin.y, Bmin.z); // 1,0,0 -> max,min,min
+	LUT[5] = glm::vec3(Bmax.x, Bmin.y, Bmax.z); // 1,0,1 -> max,min,max
+	LUT[6] = glm::vec3(Bmax.x, Bmax.y, Bmin.z); // 1,1,0 -> max,max,min
+	LUT[7] = glm::vec3(Bmax.x, Bmax.y, Bmax.z); // 1,1,1 -> max,max,max
 }

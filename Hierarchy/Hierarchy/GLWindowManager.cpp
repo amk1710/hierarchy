@@ -297,9 +297,13 @@ void GLWindowManager::InitializeSceneInfo()
 	//LOAD OBJECTS
 
 	//instancia uma "matriz" de tres dimensões de objetos
-	int n_side = 1; // NxNxN
+	int n_side = 3; // NxNxN
 	float offset = 5.0f; // a distância entre dois objs
 	int startOffset = -offset * ((n_side - 1) / 2);
+
+	//sample obj
+	RenderObject *sample = new RenderObject();
+	sample->LoadObjectFromPath("golfball/golfball.obj");
 
 	for (int i = 0; i < n_side; i++)
 	{
@@ -307,17 +311,22 @@ void GLWindowManager::InitializeSceneInfo()
 		{
 			for (int k = 0; k < n_side; k++)
 			{
-				RenderObject obj = RenderObject();
-				obj.LoadObjectFromPath("golfball/golfball.obj");
-				obj.Initialize();
-				obj.positionX = startOffset + i * offset;
-				obj.positionY = startOffset + j * offset;
-				obj.positionZ = startOffset + k * offset;
+				RenderObject *obj = new RenderObject(*sample);
+				//obj.LoadObjectFromPath("golfball/golfball.obj");
+				obj->positionX = startOffset + i * offset;
+				obj->positionY = startOffset + j * offset;
+				obj->positionZ = startOffset + k * offset;
+				obj->Initialize();
 				objects.push_back(obj);
 
 			}
 		}
 	}
+
+	delete sample;
+
+	//organiza todos os objs criados numa árvore de hierarquia. Para fazer a deleção posteriormente, também faço por essa árvore
+	HierarchyRoot = RenderObject::ConstructHierarchy(objects);
 
 	/*RenderObject obj = RenderObject();
 	obj.LoadObjectFromPath("golfball/golfball.obj");
@@ -356,7 +365,7 @@ void GLWindowManager::StartRenderLoop()
 	
 	lastTime = glfwGetTime();
 	int nbFrames = 0;
-
+	int count_obj = 0;
 	while (!glfwWindowShouldClose(window))
 	{
 		//counts seconds per frame
@@ -364,10 +373,13 @@ void GLWindowManager::StartRenderLoop()
 		nbFrames++;
 		if (currentTime - lastTime >= 1.0) //se já passou um segundo,
 		{
+			//printo também qtd de objs renderizados
+			cout << count_obj << "object(s) rendered" << endl;
 			//printo spf e reseto
 			cout << 1000.0 / double(nbFrames) << "ms/frame" << endl;
 			nbFrames = 0;
 			lastTime += 1.0f;
+			cout << "------------------" << endl;
 		}
 		
 		processInput(window);
@@ -401,18 +413,23 @@ void GLWindowManager::StartRenderLoop()
 			obj.Render(gPass);
 		}*/
 
-		for (int i = 0; i < objects.size(); i++)
-		{
-			FrustumCheck r = objects[i].IsInsideFrustum(Projection * View);
-			objects[i].Render(gPass);
-			cout << "Object " << i << ": " << r << endl;
-		}
-
+		count_obj = 0; //o número de objs renderizados
+		//for (int i = 0; i < objects.size(); i++)
+		//{
+		//	/*FrustumCheck r = objects[i].IsInsideFrustum(Projection * View);
+		//	objects[i].Render(gPass);
+		//	cout << "Object " << i << ": " << r << endl;
+		//	*/
+		//	count_obj += objects[i]->CheckFrustumAndRender(gPass, Projection * View); //depois, devo armazenar o valor dessa multiplica p*v, pra não repetir a conta tantas vezes
+		//}
+		count_obj = HierarchyRoot->CheckFrustumAndRender(gPass, Projection * View);
+		
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
 
 	std::cout << "window closed" << std::endl;
+	HierarchyRoot->FreeNode(); //libera memória da árvore de hierarquia
 	glfwTerminate();
 	return;
 }
