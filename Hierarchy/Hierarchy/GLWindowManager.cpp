@@ -22,6 +22,7 @@
 
 #include "GLWindowManager.h"
 #include "RenderObject.h"
+#include "BVHNode.h"
 
 
 
@@ -404,7 +405,7 @@ void GLWindowManager::StartRenderLoop()
 		{
 			FrustumCheck r = objects[i].IsInsideFrustum(Projection * View);
 			objects[i].Render(gPass);
-			//cout << "Object " << i << ": " << r << endl;
+			cout << "Object " << i << ": " << r << endl;
 		}
 
 		glfwSwapBuffers(window);

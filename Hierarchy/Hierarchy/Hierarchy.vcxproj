@@ -164,6 +164,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AggregatorNode.cpp" />
+    <ClCompile Include="BVHNode.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="GLWindowManager.cpp" />
     <ClCompile Include="lodepng.cpp" />
@@ -171,6 +173,7 @@
     <ClCompile Include="RenderObject.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AggregatorNode.h" />
     <ClInclude Include="BVHNode.h" />
     <ClInclude Include="GLWindowManager.h" />
     <ClInclude Include="lodepng.h" />

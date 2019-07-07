@@ -23,6 +23,7 @@ using namespace std;
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+#include "BVHNode.h"
 #include "RenderObject.h"
 
 //constructor and destructor
@@ -41,172 +42,10 @@ RenderObject::~RenderObject()
 
 //auxilary functions and structs
 
-//plane frustum funcionality
 
-//normaliza um plano
-void NormalizePlane(glm::vec4 &plane)
+void RenderObject::CheckFrustumAndRender(unsigned int shaderID, glm::mat4 ViewProjection)
 {
-	float mag = sqrt(plane.x * plane.x + plane.y * plane.y + plane.z * plane.z);
-
-	plane.x = plane.x / mag;
-	plane.y = plane.y / mag;
-	plane.z = plane.z / mag;
-	plane.w = plane.w / mag;
-}
-
-// extrai os frustums planes da matrix mvp
-// https://www.gamedevs.org/uploads/fast-extraction-viewing-frustum-planes-from-world-view-projection-matrix.pdf
-void ExtractFrustumPlanes(glm::mat4 mvp, std::array<glm::vec4, 6> &planes)
-{
-	//// left
-	//planes[0] = glm::vec4(
-	//	mvp[3][0] + mvp[0][0],
-	//	mvp[3][1] + mvp[0][1],
-	//	mvp[3][2] + mvp[0][2],
-	//	mvp[3][3] + mvp[0][3]
-	//);
-
-	////right
-	//planes[1] = glm::vec4(
-	//	mvp[3][0] - mvp[0][0],
-	//	mvp[3][1] - mvp[0][1],
-	//	mvp[3][2] - mvp[0][2],
-	//	mvp[3][3] - mvp[0][3]
-	//);
-
-	////bottom
-	//planes[2] = glm::vec4(
-	//	mvp[3][0] + mvp[1][0],
-	//	mvp[3][1] + mvp[1][1],
-	//	mvp[3][2] + mvp[1][2],
-	//	mvp[3][3] + mvp[1][3]
-	//);
-
-
-	////top
-	//planes[3] = glm::vec4(
-	//	mvp[3][0] - mvp[1][0],
-	//	mvp[3][1] - mvp[1][1],
-	//	mvp[3][2] - mvp[1][2],
-	//	mvp[3][3] - mvp[1][3]
-	//);
-
-	////near
-	//planes[4] = glm::vec4(
-	//	mvp[3][0] + mvp[2][0],
-	//	mvp[3][1] + mvp[2][1],
-	//	mvp[3][2] + mvp[2][2],
-	//	mvp[3][3] + mvp[2][3]
-	//);
-
-	////cout << "mvp mat" << endl;
-	////cout << mvp[2][0] <<", " << mvp[2][1] << ", " << mvp[2][2] << ", " << mvp[2][3] << endl;
-
-	////far
-	//planes[5] = glm::vec4(
-	//	mvp[3][0] - mvp[2][0],
-	//	mvp[3][1] - mvp[2][1],
-	//	mvp[3][2] - mvp[2][2],
-	//	mvp[3][3] - mvp[2][3]
-	//);
-
-	////normaliza os planos, o os orienta "para fora"
-	//for (int i = 0; i < 6; i++)
-	//{
-	//	//NormalizePlane(planes[i]);
-	//}
-	//return;
-
-	//a transposta da mvp, pra destransformar os planos em espaço pós-projeção
-	glm::mat4 mvpT = glm::transpose(mvp);
-
-	//todos os planos estão a 1.0 de distância da origem, mas orientados diferentemente, com normais diferentes
-	planes[0] = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f); //right
-	planes[1] = glm::vec4(-1.0f, 0.0f, 0.0f, 1.0f); //left
-	planes[2] = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f); //up
-	planes[3] = glm::vec4(0.0f, -1.0f, 0.0f, 1.0f); //down
-	planes[4] = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f); //far
-	planes[5] = glm::vec4(0.0f, 0.0f, -1.0f, 1.0f); //near
-
-	for (int i = 0; i < 6; i++)
-	{
-		planes[i] = mvpT * planes[i];
-		//planes[i] = planes[i] / planes[i].w;
-	}
-
 	return;
-
-}
-
-//os planos que definem, no opengl, o cubo para renderização, obtido após a multiplicação pela matriz de projeção
-//a ideia é, depois, na verificação de se este objeto está no frustum, multiplicar estes planos pela inversa da mvp,
-// de modo a obter o frustum no espaço do objeto e poder verificar
-//checks if the computed bounding box for this object is inside the view frustum
-
-
-//recebe como parametro as normais que definem cada plano, no espaço do mundo, e o ponto que marca o deslocamento deste plano a partir da origem
-//ou não né, vamos ver
-
-FrustumCheck RenderObject::IsInsideFrustum(glm::mat4 ViewProjection)
-{
-	std::array<glm::vec4, 6> planes;
-	
-	ExtractFrustumPlanes(ViewProjection * model, planes);
-	
-	//planos estão no espaço do modelo, direcionados para fora (?)
-	//ax + by + cz + d = 0, em um glm::vec4?
-
-	bool intersects = false;
-
-	for (int i = 0; i < 6; i++)
-	{
-		glm::vec3 normal = glm::vec3(planes[i]);
-		normal = glm::normalize(normal);
-
-		float d = planes[i].w;
-		//acessa LUT baseado na normal do plano
-		int s1 = normal.x > 0 ? 1 : 0; //e se for == 0? Não importa?
-		int s2 = normal.y > 0 ? 1 : 0;
-		int s3 = normal.z > 0 ? 1 : 0;
-		
-		glm::vec3 Pmax = LUT[4 * s1 + 2 * s2 + s3]; //max ou min?
-		//inverte LUTs (eu acho que pode ser feito de outro jeito, com 8 - x = y?)
-		s1 = s1 == 1 ? 0 : 1;
-		s2 = s2 == 1 ? 0 : 1;
-		s3 = s3 == 1 ? 0 : 1;
-		glm::vec3 Pmin = LUT[4 * s1 + 2 * s2 + s3]; //max ou min
-
-		//calcula para o ponto Pmin e Pmax a distância até o plano
-		//normais apontam para fora (?)
-		//http://mathworld.wolfram.com/Point-PlaneDistance.html
-		float distMin = glm::dot(normal, Pmin) + d; // >0 mesmo lado, <0 outro lado, ==0 no plano;
-		float distMax = glm::dot(normal, Pmax) + d;
-		
-		//>0 tá dentro, < 0 tá fora
-		if(distMin < 0.0f && distMax < 0.0f) //Pmin e Pmax estão fora
-		{
-			return OUTSIDE;
-		}
-		else if(distMin < 0.0f && distMax > 0.0f) //Pmin está dentro e Pmax está fora
-		{
-			intersects = true;
-		}
-		else
-		{
-			//está dentro para este plano, continuo checando
-		}
-
-	}
-
-	if(intersects)
-	{
-		return INTERSECT;
-	}
-	else
-	{
-		return INSIDE;
-	}
-
 }
 
 // MODEL LOADING FUNCTIONALITY
@@ -380,6 +219,11 @@ void RenderObject::LoadModel(const char* objName, bool randomColors = false)
 
 }
 
+FrustumCheck RenderObject::IsInsideFrustum(glm::mat4 ViewProjection)
+{
+	return BVHNode::IsInsideFrustum(ViewProjection * model);
+}
+
 // utility function for loading a 2D texture from file
 // ---------------------------------------------------
 unsigned int RenderObject::LoadTexture(char const * path)
@@ -461,8 +305,8 @@ void RenderObject::ConstructBoundingBox()
 	}
 
 	//na prática, 3,3,3 acabou funcionando melhor por causa de erro numérico, creio eu
-	Bmin = glm::vec3(-3.0f, -3.0f, -3.0f);
-	Bmax = glm::vec3(3.0f, 3.0f, 3.0f);
+	//Bmin = glm::vec3(-3.0f, -3.0f, -3.0f);
+	//Bmax = glm::vec3(3.0f, 3.0f, 3.0f);
 
 
 	//com Bmin e Bmax, constrói LUT para acesso rápido de Vmin, Vmax
