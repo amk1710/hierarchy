@@ -25,4 +25,6 @@ public:
 
 	glm::vec3 GetBmin();
 	glm::vec3 GetBmax();
+
+	void PrintHierarchy(ofstream& myfile, FrustumCheck check, glm::mat4 ViewProjection, int tabulation);
 };

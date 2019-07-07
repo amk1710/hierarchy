@@ -46,4 +46,6 @@ public:
 
 	virtual void FreeNode() = 0;
 
+	virtual void PrintHierarchy(ofstream& myfile, FrustumCheck check, glm::mat4 ViewProjection, int tabulation) = 0;
+
 };

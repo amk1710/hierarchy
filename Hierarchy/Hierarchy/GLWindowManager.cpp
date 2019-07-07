@@ -46,63 +46,76 @@ void GLWindowManager::processInput(GLFWwindow *window)
 	//move olho
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 	{
-		eye.x -= 0.01;
+		eye.x -= 0.1;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
-		eye.x += 0.01;
+		eye.x += 0.1;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
-		eye.z += 0.01;
+		eye.z += 0.1;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 	{
-		eye.z -= 0.01f;
+		eye.z -= 0.1f;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
 	{
-		eye.y += 0.01f;
+		eye.y += 0.1f;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
 	{
-		eye.y -= 0.01f;
+		eye.y -= 0.1f;
 	}
 
 	//move camera target
 	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
 	{
-		cameraTarget.x -= 0.01;
+		cameraTarget.x -= 0.1;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
 	{
-		cameraTarget.x += 0.01;
+		cameraTarget.x += 0.1;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
 	{
-		cameraTarget.z += 0.01;
+		cameraTarget.z += 0.1;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
 	{
-		cameraTarget.z -= 0.01f;
+		cameraTarget.z -= 0.1f;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
 	{
-		cameraTarget.y += 0.01f;
+		cameraTarget.y += 0.1f;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS)
 	{
-		cameraTarget.y -= 0.01f;
+		cameraTarget.y -= 0.1f;
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS)
+	{
+		//printa status da árvore
+		ofstream myfile;
+		myfile.open("out.txt");
+		if (HierarchyRoot != NULL)
+		{
+			HierarchyRoot->PrintHierarchy(myfile, INTERSECT, Projection*View, 0);
+		}
+		myfile.close();
+		cout << "Outputted tree debug log" << endl;
 	}
 
 
@@ -297,7 +310,7 @@ void GLWindowManager::InitializeSceneInfo()
 	//LOAD OBJECTS
 
 	//instancia uma "matriz" de tres dimensões de objetos
-	int n_side = 3; // NxNxN
+	int n_side = 6; // NxNxN
 	float offset = 5.0f; // a distância entre dois objs
 	int startOffset = -offset * ((n_side - 1) / 2);
 

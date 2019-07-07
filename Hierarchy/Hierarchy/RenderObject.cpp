@@ -443,8 +443,34 @@ int RenderObject::Render(unsigned int shaderID)
 //constrói hierarquia de objetos, a partir de uma lista de objs concretos renderizáveis
 //se baseia nas subclasses aggregator node e renderobject
 
+//aux: as funções de comparação
+typedef bool(*CompFunction) (BVHNode* a, BVHNode* b);
+
+bool comp0(BVHNode* a, BVHNode* b)
+{
+	float medA = (a->GetBmax()[0] + a->GetBmin()[0]) / 2;
+	float medB = (b->GetBmax()[0] + b->GetBmin()[0]) / 2;
+
+	return a < b;
+}
+bool comp1(BVHNode* a, BVHNode* b)
+{
+	float medA = (a->GetBmax()[1] + a->GetBmin()[1]) / 2;
+	float medB = (b->GetBmax()[1] + b->GetBmin()[1]) / 2;
+
+	return a < b;
+}
+bool comp2(BVHNode* a, BVHNode* b)
+{
+	float medA = (a->GetBmax()[2] + a->GetBmin()[2]) / 2;
+	float medB = (b->GetBmax()[2] + b->GetBmin()[2]) / 2;
+
+	return a < b;
+}
+CompFunction comp_functions[] = { comp0, comp1, comp2 };
+
 //aux: funcção recursiva
-BVHNode* RenderObject::ConstructHierarchy_aux(std::vector<BVHNode*> objects, int s, int e) //as posições de começo e fim da lista, para fazer a recursão
+BVHNode* RenderObject::ConstructHierarchy_aux(std::vector<BVHNode*> objects, int s, int e, int depth) //as posições de começo e fim da lista, para fazer a recursão
 {
 	//fazemos um algoritmo bem simplista: o median-cut, como descrito brevemente em
 	//https://cumincad.architexturez.net/system/files/pdf/67d2.content.pdf
@@ -461,8 +487,11 @@ BVHNode* RenderObject::ConstructHierarchy_aux(std::vector<BVHNode*> objects, int
 		//construo um aggregator e recurso 2x
 		AggregatorNode* agg = new AggregatorNode();
 
-		BVHNode* left = ConstructHierarchy_aux(objects, s, (s + e) / 2);
-		BVHNode* right = ConstructHierarchy_aux(objects, ((s + e) / 2) + 1, e);
+		//antes de continuar a recursão, ordeno a lista baseado em uma dimensão arbitrária, que é revezada a cada recursão
+		std::sort(objects.begin() + s, objects.begin() + e, comp_functions[depth % 2]);
+
+		BVHNode* left = ConstructHierarchy_aux(objects, s, (s + e) / 2, ++depth);
+		BVHNode* right = ConstructHierarchy_aux(objects, ((s + e) / 2) + 1, e, ++depth);
 
 		//adjust bounds: a nova caixa pega os mins e maxs das dimensões das duas subcaixas
 		glm::vec3 LBmin = left->GetBmin();
@@ -496,7 +525,7 @@ BVHNode* RenderObject::ConstructHierarchy(std::vector<BVHNode*> objects)
 
 	//return agg;
 
-	return RenderObject::ConstructHierarchy_aux(objects, 0, objects.size() - 1);
+	return RenderObject::ConstructHierarchy_aux(objects, 0, objects.size() - 1, 0);
 
 
 }
@@ -509,6 +538,15 @@ glm::vec3 RenderObject::GetBmin()
 glm::vec3 RenderObject::GetBmax()
 {
 	return glm::vec3(model * glm::vec4(Bmax, 1));
+}
+
+void RenderObject::PrintHierarchy(ofstream& myfile, FrustumCheck check, glm::mat4 ViewProjection, int tabulation)
+{
+	if (check == INTERSECT)
+	{
+		check = IsInsideFrustum(ViewProjection);
+	}
+	myfile << std::string(tabulation, ' ') << "Object: " << check << endl;
 }
 
 

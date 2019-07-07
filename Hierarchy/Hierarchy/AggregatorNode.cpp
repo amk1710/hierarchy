@@ -98,3 +98,17 @@ glm::vec3 AggregatorNode::GetBmax()
 {
 	return Bmax;
 }
+
+void AggregatorNode::PrintHierarchy(ofstream& myfile, FrustumCheck check, glm::mat4 ViewProjection, int tabulation)
+{
+	if (check == INTERSECT)
+	{
+		check = IsInsideFrustum(ViewProjection);
+	}
+	myfile << std::string(tabulation, ' ') << "AggNode: " << check << endl;
+	for (BVHNode* node : children)
+	{
+		node->PrintHierarchy(myfile, check, ViewProjection, tabulation + 1);
+	}
+
+}

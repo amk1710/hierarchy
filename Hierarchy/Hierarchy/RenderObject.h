@@ -64,7 +64,7 @@ private:
 	void ConstructBoundingBox();
 	
 	//aux: funcção recursiva
-	static BVHNode* RenderObject::ConstructHierarchy_aux(std::vector<BVHNode*> objects, int s, int e); //as posições de começo e fim da lista, para fazer a recursão
+	static BVHNode* RenderObject::ConstructHierarchy_aux(std::vector<BVHNode*> objects, int s, int e, int depth); //as posições de começo e fim da lista, para fazer a recursão
 
 	void LoadModel(const char* objName, bool randomColors);
 	unsigned int LoadTexture(char const * path);
@@ -103,6 +103,8 @@ public:
 
 	glm::vec3 GetBmin();
 	glm::vec3 GetBmax();
+
+	void PrintHierarchy(ofstream& myfile, FrustumCheck check, glm::mat4 ViewProjection, int tabulation);
 
 
 };
