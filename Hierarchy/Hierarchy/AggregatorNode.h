@@ -15,7 +15,7 @@ private:
 	std::vector<BVHNode*> children;
 public:
 
-	FrustumCheck IsInsideFrustum(glm::mat4 ModelViewProjection);
+	FrustumCheck IsInsideFrustum(glm::mat4 ModelViewProjection, bool check_planes[6] = def_check_plane);
 	int CheckFrustumAndRender(unsigned int shaderID, glm::mat4 ViewProjection);
 	int Render(unsigned int shaderID);
 

@@ -22,7 +22,7 @@ using namespace std;
 
 #define TINYOBJLOADER_IMPLEMENTATION
 
-#include "BVHNode.h"
+//#include "BVHNode.h"
 #include "RenderObject.h"
 #include "AggregatorNode.h"
 
@@ -239,9 +239,9 @@ void RenderObject::LoadModel(const char* objName, bool randomColors = false)
 
 }
 
-FrustumCheck RenderObject::IsInsideFrustum(glm::mat4 ViewProjection)
+FrustumCheck RenderObject::IsInsideFrustum(glm::mat4 ViewProjection, bool check_planes[6]) //def: {true...}
 {
-	return BVHNode::IsInsideFrustum(ViewProjection * model);
+	return BVHNode::IsInsideFrustum(ViewProjection * model, check_planes);
 }
 
 // utility function for loading a 2D texture from file

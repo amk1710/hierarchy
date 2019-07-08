@@ -22,8 +22,10 @@ using namespace std;
 #include "stb_image.h"
 
 #include "BVHNode.h"
-#include "AggregatorNode.h"
-#include "RenderObject.h"
+
+bool def_check_plane[6] = { true, true, true, true, true, true };
+//#include "AggregatorNode.h"
+//#include "RenderObject.h"
 
 //plane frustum funcionality
 // extrai os frustums planes da matrix mvp
@@ -63,7 +65,7 @@ void ExtractFrustumPlanes(glm::mat4 mvp, std::array<glm::vec4, 6> &planes)
 //recebe como parametro as normais que definem cada plano, no espaço do mundo, e o ponto que marca o deslocamento deste plano a partir da origem
 //ou não né, vamos ver
 
-FrustumCheck BVHNode::IsInsideFrustum(glm::mat4 ModelViewProjection)
+FrustumCheck BVHNode::IsInsideFrustum(glm::mat4 ModelViewProjection, bool check_planes[6]) //def argument {true...}
 {
 	std::array<glm::vec4, 6> planes;
 
@@ -76,10 +78,19 @@ FrustumCheck BVHNode::IsInsideFrustum(glm::mat4 ModelViewProjection)
 
 	for (int i = 0; i < 6; i++)
 	{
-		glm::vec3 normal = glm::vec3(planes[i]);
+		//checa na "mais ótima", baseada na experiência de outros frames
+		unsigned int index = plane_order[i];
+
+		if (!check_planes[index])
+		{
+			//se este plano já tiver sido eliminado em um checagem anterior(acima de mim na hierarquia), não preciso checar
+			continue;
+		}
+		
+		glm::vec3 normal = glm::vec3(planes[index]);
 		normal = glm::normalize(normal);
 
-		float d = planes[i].w;
+		float d = planes[index].w;
 		//acessa LUT baseado na normal do plano
 		int s1 = normal.x > 0 ? 1 : 0; //e se for == 0? Não importa?
 		int s2 = normal.y > 0 ? 1 : 0;
@@ -101,6 +112,8 @@ FrustumCheck BVHNode::IsInsideFrustum(glm::mat4 ModelViewProjection)
 		//>0 tá dentro, < 0 tá fora
 		if (distMin < 0.0f && distMax < 0.0f) //Pmin e Pmax estão fora
 		{
+			//aumento a prioridade deste plano, pra poder checar mais rápido em tentativas futuras
+			place_first(plane_order, i);
 			return OUTSIDE;
 		}
 		else if (distMin < 0.0f && distMax > 0.0f) //Pmin está dentro e Pmax está fora

@@ -1,7 +1,19 @@
-﻿  RenderObject.cpp
+﻿  BVHNode.cpp
+  Generating Code...
+  Compiling...
+  main.cpp
+  RenderObject.cpp
 c:\users\andre\documents\hierarchy\hierarchy\hierarchy\renderobject.cpp(133): warning C4018: '<': signed/unsigned mismatch
 c:\users\andre\documents\hierarchy\hierarchy\hierarchy\renderobject.cpp(171): warning C4018: '<': signed/unsigned mismatch
 c:\users\andre\documents\hierarchy\hierarchy\hierarchy\renderobject.cpp(187): warning C4018: '<': signed/unsigned mismatch
+  GLWindowManager.cpp
+c:\users\andre\documents\hierarchy\hierarchy\hierarchy\glwindowmanager.cpp(49): warning C4305: '-=': truncation from 'double' to 'float'
+c:\users\andre\documents\hierarchy\hierarchy\hierarchy\glwindowmanager.cpp(54): warning C4305: '+=': truncation from 'double' to 'float'
+c:\users\andre\documents\hierarchy\hierarchy\hierarchy\glwindowmanager.cpp(59): warning C4305: '+=': truncation from 'double' to 'float'
+c:\users\andre\documents\hierarchy\hierarchy\hierarchy\glwindowmanager.cpp(80): warning C4305: '-=': truncation from 'double' to 'float'
+c:\users\andre\documents\hierarchy\hierarchy\hierarchy\glwindowmanager.cpp(85): warning C4305: '+=': truncation from 'double' to 'float'
+c:\users\andre\documents\hierarchy\hierarchy\hierarchy\glwindowmanager.cpp(90): warning C4305: '+=': truncation from 'double' to 'float'
+c:\users\andre\documents\hierarchy\hierarchy\hierarchy\glwindowmanager.cpp(315): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
   AggregatorNode.cpp
   Generating Code...
 c:\users\andre\documents\hierarchy\hierarchy\hierarchy\renderobject.cpp(69): warning C4715: 'RenderObject::CheckFrustumAndRender': not all control paths return a value

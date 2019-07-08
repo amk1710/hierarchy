@@ -73,7 +73,7 @@ public:
 
 	//recebe como argumento as seis normais que definem os planos do frustum, no espaço do mundo,
 	//e os seis pontos que definem o deslocamento do plano em relação à origem
-	FrustumCheck IsInsideFrustum(glm::mat4 ViewProjection);
+	FrustumCheck IsInsideFrustum(glm::mat4 ViewProjection, bool check_planes[6] = def_check_plane);
 
 
 //public:

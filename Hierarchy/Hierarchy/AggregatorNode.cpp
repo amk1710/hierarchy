@@ -16,7 +16,7 @@
 #include <limits>
 
 
-#include "BVHNode.h"
+//#include "BVHNode.h"
 #include "AggregatorNode.h"
 
 //constructor and destructor
@@ -45,9 +45,9 @@ void AggregatorNode::FreeNode()
 	//cout << i << endl;
 }
 
-FrustumCheck AggregatorNode::IsInsideFrustum(glm::mat4 ModelViewProjection)
+FrustumCheck AggregatorNode::IsInsideFrustum(glm::mat4 ModelViewProjection, bool check_planes[6]) //def: {true...}
 {
-	return BVHNode::IsInsideFrustum(ModelViewProjection);
+	return BVHNode::IsInsideFrustum(ModelViewProjection, check_planes);
 }
 
 int AggregatorNode::Render(unsigned int shaderID)
