@@ -1,0 +1,6 @@
+Material de aula - http://webserver2.tecgraf.puc-rio.br/~celes/docs/inf2610/accel_tech.pdf
+T. L. Kay and J. T. Kajiya.  Ray tracing com-plex scenes. - https://cumincad.architexturez.net/system/files/pdf/67d2.content.pdf
+https://www.scratchapixel.com/lessons/advanced-rendering/introduction-acceleration-structure/bounding-volume-hierarchy-BVH-part2
+https://coocoscode.wordpress.com/2010/12/15/building-bounding-volume-hiearchies/
+https://www.gamedev.net/articles/programming/general-and-gameplay-programming/frustum-culling-r4613/
+http://mathworld.wolfram.com/Point-PlaneDistance.html

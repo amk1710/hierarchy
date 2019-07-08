@@ -311,6 +311,7 @@ void GLWindowManager::InitializeSceneInfo()
 
 	//instancia uma "matriz" de tres dimensões de objetos
 	int n_side = 6; // NxNxN
+	total_objects = n_side * n_side * n_side;
 	float offset = 5.0f; // a distância entre dois objs
 	int startOffset = -offset * ((n_side - 1) / 2);
 
@@ -387,7 +388,7 @@ void GLWindowManager::StartRenderLoop()
 		if (currentTime - lastTime >= 1.0) //se já passou um segundo,
 		{
 			//printo também qtd de objs renderizados
-			cout << count_obj << "object(s) rendered" << endl;
+			cout << count_obj << " / " << total_objects << " object(s) rendered" << endl;
 			//printo spf e reseto
 			cout << 1000.0 / double(nbFrames) << "ms/frame" << endl;
 			nbFrames = 0;

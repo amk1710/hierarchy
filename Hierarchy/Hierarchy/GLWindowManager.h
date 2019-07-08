@@ -31,7 +31,7 @@ private:
 	unsigned int screenWidth = 800;
 	unsigned int screenHeight = 600;
 
-
+	int total_objects;
 	int width_bm;
 	int height_bm;
 	int nrChannels_bm;
