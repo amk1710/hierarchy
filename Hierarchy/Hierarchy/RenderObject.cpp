@@ -292,7 +292,7 @@ void RenderObject::LoadObjectFromPath(char const * path)
 
 	glActiveTexture(GL_TEXTURE0);
 	//tex1 = loadTexture("stones/stones.jpg");
-	tex1 = LoadTexture("golfball/white.png");
+	tex1 = LoadTexture("golfball/Test-Pattern.jpg");
 	//tex1 = loadTexture("golfball/Test-Pattern.jpg");
 	glActiveTexture(GL_TEXTURE1);
 	//tex2 = loadTexture("stones/stones_norm.jpg");

@@ -276,10 +276,10 @@ void GLWindowManager::InitializeSceneInfo()
 
 	//shaders do G pass
 	unsigned int vertexShaderG;
-	BuildShader("Gvertex.vert", &vertexShaderG, GL_VERTEX_SHADER);
+	BuildShader("vertex.vert", &vertexShaderG, GL_VERTEX_SHADER);
 	
 	unsigned int fragmentShaderG;
-	BuildShader("Gfragment.frag", &fragmentShaderG, GL_FRAGMENT_SHADER);
+	BuildShader("fragment.frag", &fragmentShaderG, GL_FRAGMENT_SHADER);
 
 	// SHADER PROGRAM G PASS
 	int success;
